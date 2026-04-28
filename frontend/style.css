@@ -1,0 +1,13 @@
+body { font-family: sans-serif; background: #f4f4f9; margin: 0; padding: 20px; }
+.admin-corner { position: absolute; top: 10px; right: 20px; font-size: 12px; }
+.container { max-width: 900px; margin: 40px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+
+/* Dashboard Layout */
+#dashboard-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
+.main-content { padding: 20px; border-right: 2px solid #eee; }
+.side-panel { padding: 20px; background: #fafafa; border-radius: 8px; }
+
+/* Leaderboard Images */
+.leaderboard-item { display: flex; align-items: center; margin-bottom: 10px; }
+.user-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; }
+.btn { background: #007bff; color: white; padding: 10px 15px; border: none; cursor: pointer; }

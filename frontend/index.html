@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>5-Day Event Platform</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="admin-corner">
+        <a href="admin.html">Admin Login</a>
+    </div>
+
+    <div id="login-section" class="container">
+        <h2>Enter Event</h2>
+        <input type="text" id="userName" placeholder="Enter your Name" required>
+        <input type="text" id="userPhone" placeholder="Enter Phone Number" required>
+        <button onclick="loginUser()" class="btn">Join Event</button>
+    </div>
+
+    <div id="dashboard-section" class="container" style="display: none;">
+        <main class="main-content">
+            <h2>Welcome, <span id="display-name"></span>!</h2>
+            <div id="today-event">
+                <h3>Today's Assessment</h3>
+                <p id="event-rules">Rules: Answer all questions carefully. MCQs and Fill-in-the-blanks are auto-graded.</p>
+                <button onclick="window.location.href='assessment.html'" class="btn">Start Assessment</button>
+            </div>
+        </main>
+
+        <aside class="side-panel">
+            <h3>Leaderboard</h3>
+            <ul id="leaderboard-list">
+                </ul>
+        </aside>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        // Auto-load dashboard if user is already logged in
+        window.onload = () => {
+            if (localStorage.getItem('userId')) {
+                document.getElementById('login-section').style.display = 'none';
+                document.getElementById('dashboard-section').style.display = 'grid';
+                document.getElementById('display-name').innerText = localStorage.getItem('userName');
+                loadLeaderboard();
+            }
+        };
+    </script>
+</body>
+</html>

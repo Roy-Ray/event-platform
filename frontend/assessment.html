@@ -1,0 +1,29 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Today's Assessment</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h2 id="assessment-title">Loading Assessment...</h2>
+        <form id="assessment-form">
+            </form>
+        <button onclick="submitAssessment()" class="btn" style="margin-top: 20px;">Submit Assessment</button>
+        <br><br>
+        <a href="index.html">Back to Dashboard</a>
+    </div>
+
+    <script src="app.js"></script>
+    <script>
+        window.onload = () => {
+            if (!localStorage.getItem('userId')) {
+                window.location.href = 'index.html';
+            } else {
+                loadQuestions();
+            }
+        };
+    </script>
+</body>
+</html>
