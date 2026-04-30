@@ -2,49 +2,145 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>5-Day Event Platform</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Event Dashboard</title>
     <link rel="stylesheet" href="style.css">
+    <!-- Google Fonts for better typography -->
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="admin-corner">
-        <a href="admin.html">Admin Login</a>
+    
+    <!-- Top Left Corner Host Image -->
+    <div class="host-profile">
+        <img src="https://res.cloudinary.com/dlvpmxac5/image/upload/v1777551373/WhatsApp_Image_2026-04-30_at_17.43.46_vbhkrk.jpg" alt="Host">
+        <div class="host-name">Pradip Bandyopadhyay</div>
     </div>
 
-    <div id="login-section" class="container">
-        <h2>Enter Event</h2>
-        <input type="text" id="userName" placeholder="Enter your Name" required>
-        <input type="text" id="userPhone" placeholder="Enter Phone Number" required>
-        <button onclick="loginUser()" class="btn">Join Event</button>
+    <!-- Top Right Corner Event Team -->
+    <div class="team-panel">
+        
+        <!-- Judge 1 -->
+        <div class="team-member">
+            <!-- Replace with actual Cloudinary link -->
+            <img src="https://res.cloudinary.com/dlvpmxac5/image/upload/v1777554372/copy_of_whatsapp_image_2026-04-30_at_155016_dzakiz_3f0c69.jpg" alt="Judge 1">
+            <div class="team-role">Swagata Biswas</div>
+            <div class="team-name">Judge of our event</div>
+        </div>
+
+        <!-- Judge 2 -->
+        <div class="team-member">
+            <!-- Replace with actual Cloudinary link -->
+            <img src="https://res.cloudinary.com/dlvpmxac5/image/upload/v1777553930/WhatsApp_Image_2026-04-30_at_15.32.48_rp2zaf.jpg" alt="Judge 2">
+            <div class="team-role">Ritam Biswas</div>
+            <div class="team-name">judge of our event</div>
+        </div>
+
+        <!-- Moderator -->
+        <div class="team-member">
+            <!-- Replace with actual Cloudinary link -->
+            <img src="https://res.cloudinary.com/dlvpmxac5/image/upload/v1777553685/672680446_26094292056939599_6935226973905409503_n_splbyy.jpg" alt="Moderator">
+            <div class="team-role">Dipan Bandyopadhyay </div>
+            <div class="team-name">Modarator</div>
+        </div>
+
+        <!-- Adviser -->
+        <div class="team-member">
+            <!-- Replace with actual Cloudinary link -->
+            <img src="https://res.cloudinary.com/dlvpmxac5/image/upload/v1777553509/591585503_1315831083890594_3587239061274294329_n_mgtv0r.jpg" alt="Adviser">
+            <div class="team-role">Bandana Bandyopadhyay</div>
+            <div class="team-name">Event Adviser</div>
+        </div>
+
     </div>
 
-    <div id="dashboard-section" class="container" style="display: none;">
-        <main class="main-content">
-            <h2>Welcome, <span id="display-name"></span>!</h2>
-            <div id="today-event">
-                <h3>Today's Assessment</h3>
-                <p id="event-rules">Rules: Answer all questions carefully. MCQs and Fill-in-the-blanks are auto-graded.</p>
-                <button onclick="window.location.href='assessment.html'" class="btn">Start Assessment</button>
+    <!-- Centered Header Section -->
+    <header class="event-header">
+        <h1>🎓 Student Assessment Event</h1>
+        <h2 class="event-subtitle">Event: <span>Prodiper Bondana</span></h2>
+        <p class="organizer">Organized by: Admin Team™</p>
+        
+        <div class="status-badge">🎯 Event Started!</div>
+        <br>
+        <div class="live-viewers">Live Viewers: <span id="active-count">Loading...</span></div>
+    </header>
+
+    <div class="container">
+        
+        <!-- ==========================================
+             PRE-LOGIN VIEW (Login + Eligible List)
+             ========================================== -->
+        <div id="pre-login-view" class="dashboard-wrapper">
+            
+            <!-- Left Side: Login Form -->
+            <div class="card">
+                <h2 style="text-align: center; margin-top:0; color: var(--neon-cyan);">Join Event</h2>
+                <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px;">Enter your details to join the assessment.</p>
+                
+                <label>Full Name</label>
+                <input type="text" id="userName" placeholder="Enter your name" required>
+                
+                <label>District</label>
+                <input type="text" id="userDistrict" placeholder="Enter your district" required>
+                
+                <label>Event Code</label>
+                <input type="password" id="generalCode" placeholder="Enter secret code" required>
+                
+                <button id="login-btn" class="btn" style="margin-top: 10px;">Let's Start</button>
             </div>
-        </main>
 
-        <aside class="side-panel">
-            <h3>Leaderboard</h3>
-            <ul id="leaderboard-list">
+            <!-- Right Side: Eligible Participants -->
+            <div class="card">
+                <h3 class="leaderboard-header" style="color: #ff007f;">👥 Eligible Participants</h3>
+                
+                <ul id="eligible-list" class="leaderboard-list">
+                    <!-- JS will inject the eligible participants here -->
+                    <p style="text-align: center; color: var(--text-muted);">Loading participants...</p>
                 </ul>
-        </aside>
+            </div>
+            
+        </div>
+
+        <!-- ==========================================
+             POST-LOGIN VIEW (Assessment + Leaderboard)
+             ========================================== -->
+        <div id="post-login-view" class="dashboard-wrapper" style="display: none;">
+            
+            <!-- Left Side: Assessment Action Area -->
+            <div class="card">
+                <h3 class="action-title">Ready for Assessment ⏱️</h3>
+                
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <p style="font-size: 18px;">Welcome, <strong id="display-name" style="color: var(--neon-cyan);"></strong></p>
+                </div>
+
+                <div class="assessment-rules">
+                    <p><strong>Rules of Engagement:</strong></p>
+                    <p>1. Strict timers are active per question.</p>
+                    <p>2. Copy-pasting is disabled.</p>
+                    <p>3. Do not refresh the page during the test.</p>
+                </div>
+                
+                <button onclick="window.location.href='assessment.html'" class="btn" style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                    ▶ Start Now
+                </button>
+            </div>
+
+            <!-- Right Side: Leaderboard -->
+            <div class="card">
+                <h3 class="leaderboard-header">🏆 Top Performers</h3>
+                
+                <ul id="leaderboard-list" class="leaderboard-list">
+                    <!-- JS will inject the exact list layout here -->
+                    <p style="text-align: center; color: var(--text-muted);">Loading rankings...</p>
+                </ul>
+            </div>
+
+        </div>
     </div>
+
+    <!-- Admin Link hidden in corner -->
+    <a href="admin.html" style="position: fixed; bottom: 20px; right: 20px; color: var(--text-muted); font-size: 12px; text-decoration: none;">Judge Login</a>
 
     <script src="app.js"></script>
-    <script>
-        // Auto-load dashboard if user is already logged in
-        window.onload = () => {
-            if (localStorage.getItem('userId')) {
-                document.getElementById('login-section').style.display = 'none';
-                document.getElementById('dashboard-section').style.display = 'grid';
-                document.getElementById('display-name').innerText = localStorage.getItem('userName');
-                loadLeaderboard();
-            }
-        };
-    </script>
 </body>
 </html>

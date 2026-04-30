@@ -1,13 +1,307 @@
-body { font-family: sans-serif; background: #f4f4f9; margin: 0; padding: 20px; }
-.admin-corner { position: absolute; top: 10px; right: 20px; font-size: 12px; }
-.container { max-width: 900px; margin: 40px auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 4px 8px rgba(0,0,0,0.1); }
+/* ==========================================
+   GLOBAL STYLES & VARIABLES
+   ========================================== */
+:root {
+    --bg-dark: #120822; /* Deep purple background */
+    --card-bg: #1e1133; /* Slightly lighter purple for cards */
+    --item-bg: #160a26; /* Darker background for list items */
+    --neon-pink: #ff007f;
+    --neon-cyan: #00f0ff;
+    --text-main: #ffffff;
+    --text-muted: #a098b0;
+    --border-color: rgba(255, 255, 255, 0.08);
+}
 
-/* Dashboard Layout */
-#dashboard-section { display: grid; grid-template-columns: 2fr 1fr; gap: 20px; }
-.main-content { padding: 20px; border-right: 2px solid #eee; }
-.side-panel { padding: 20px; background: #fafafa; border-radius: 8px; }
+body { 
+    font-family: 'Poppins', 'Segoe UI', Tahoma, sans-serif; 
+    background-color: var(--bg-dark); 
+    background-image: 
+        radial-gradient(circle at 0% 20%, rgba(255, 0, 128, 0.15) 0%, transparent 40%),
+        radial-gradient(circle at 100% 80%, rgba(0, 240, 255, 0.1) 0%, transparent 40%);
+    margin: 0; 
+    padding: 0; 
+    color: var(--text-main); 
+    min-height: 100vh;
+}
 
-/* Leaderboard Images */
-.leaderboard-item { display: flex; align-items: center; margin-bottom: 10px; }
-.user-avatar { width: 40px; height: 40px; border-radius: 50%; margin-right: 10px; object-fit: cover; }
-.btn { background: #007bff; color: white; padding: 10px 15px; border: none; cursor: pointer; }
+/* ==========================================
+   HEADER & TYPOGRAPHY
+   ========================================== */
+.event-header {
+    text-align: center;
+    padding: 30px 20px 10px;
+}
+
+.event-header h1 {
+    font-size: 36px;
+    margin: 0 0 10px 0;
+    text-shadow: 0 0 10px rgba(255,255,255,0.5);
+}
+
+.event-subtitle {
+    font-size: 20px;
+    font-weight: 600;
+    margin: 5px 0;
+}
+
+.event-subtitle span {
+    color: #ffd700; /* Gold color like the image */
+}
+
+.organizer {
+    color: var(--text-muted);
+    font-size: 14px;
+    margin-bottom: 20px;
+}
+
+/* Status Button */
+.status-badge {
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    padding: 8px 24px;
+    border-radius: 30px;
+    font-weight: bold;
+    display: inline-block;
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+    margin-bottom: 15px;
+}
+
+.live-viewers {
+    background: var(--card-bg);
+    padding: 12px;
+    border-radius: 8px;
+    display: inline-block;
+    font-size: 14px;
+    border: 1px solid var(--border-color);
+}
+
+.live-viewers span { color: #ffd700; font-weight: bold; }
+
+/* ==========================================
+   LAYOUT CONTAINERS
+   ========================================== */
+.container {
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.dashboard-wrapper {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* 50/50 split like the image */
+    gap: 30px;
+    align-items: start;
+    margin-top: 20px;
+}
+
+.card {
+    background: var(--card-bg);
+    border-radius: 16px;
+    padding: 30px;
+    border: 1px solid var(--border-color);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+}
+
+/* ==========================================
+   FORMS & BUTTONS
+   ========================================== */
+input, select, textarea { 
+    width: 100%; 
+    padding: 14px; 
+    margin: 10px 0 20px 0; 
+    border: 1px solid var(--border-color); 
+    border-radius: 8px; 
+    box-sizing: border-box; 
+    font-size: 15px;
+    background: rgba(0,0,0,0.2);
+    color: white;
+}
+
+input:focus { outline: none; border-color: var(--neon-cyan); }
+
+.btn { 
+    background: linear-gradient(90deg, #ff007f, #7928ca); 
+    color: white; 
+    padding: 15px 24px; 
+    border: none; 
+    border-radius: 30px; 
+    cursor: pointer; 
+    font-size: 18px; 
+    font-weight: bold;
+    width: 100%;
+    transition: transform 0.2s, box-shadow 0.2s;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.btn:hover { 
+    transform: translateY(-2px); 
+    box-shadow: 0 0 20px rgba(255, 0, 127, 0.5); 
+}
+
+/* ==========================================
+   MAIN ACTION AREA (LEFT)
+   ========================================== */
+.action-title {
+    text-align: center;
+    color: white;
+    text-transform: uppercase;
+    letter-spacing: 2px;
+    text-shadow: 0 0 10px var(--neon-pink);
+    margin-bottom: 30px;
+}
+
+.assessment-rules {
+    background: rgba(0,0,0,0.2);
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 30px;
+    border-left: 4px solid var(--neon-cyan);
+}
+
+.assessment-rules p { margin: 5px 0; color: #ccc; }
+
+/* ==========================================
+   LEADERBOARD (RIGHT)
+   ========================================== */
+.leaderboard-header {
+    text-align: center;
+    color: var(--neon-cyan);
+    font-size: 22px;
+    margin-bottom: 25px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.leaderboard-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    max-height: 400px;
+    overflow-y: auto;
+}
+
+/* Custom Scrollbar for Leaderboard */
+.leaderboard-list::-webkit-scrollbar { width: 6px; }
+.leaderboard-list::-webkit-scrollbar-track { background: transparent; }
+.leaderboard-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
+
+.lb-item {
+    display: flex;
+    align-items: center;
+    background: var(--item-bg);
+    padding: 15px;
+    border-radius: 12px;
+    margin-bottom: 12px;
+    border: 1px solid var(--border-color);
+}
+
+.lb-rank {
+    font-size: 20px;
+    font-weight: 900;
+    color: #ffd700;
+    width: 40px;
+}
+
+.lb-avatar {
+    width: 48px;
+    height: 48px;
+    border-radius: 50%;
+    object-fit: cover;
+    border: 2px solid var(--neon-pink);
+    margin-right: 15px;
+}
+
+.lb-info { flex-grow: 1; }
+.lb-name { font-weight: bold; font-size: 16px; margin: 0 0 4px 0; }
+.lb-district { font-size: 12px; color: var(--text-muted); margin: 0; }
+
+.lb-score {
+    background: rgba(0, 240, 255, 0.1);
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    padding: 6px 12px;
+    border-radius: 20px;
+    font-weight: bold;
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+/* ==========================================
+   HOST PROFILE (TOP LEFT CORNER)
+   ========================================== */
+.host-profile {
+    position: absolute;
+    top: 20px;
+    left: 20px;
+    text-align: center;
+    z-index: 100;
+}
+
+.host-profile img {
+    width: 110px;
+    height: 110px;
+    border-radius: 50%;
+    border: 3px solid var(--neon-pink);
+    object-fit: cover;
+    box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+}
+
+.host-name {
+    color: #ffd700; /* Gold color */
+    font-weight: 900;
+    font-size: 16px;
+    margin-top: 5px;
+    text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
+    letter-spacing: 1px;
+}
+/* ==========================================
+   EVENT TEAM PANEL (RIGHT SIDE)
+   ========================================== */
+.team-panel {
+    position: absolute;
+    top: 60px;
+    right: 20px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    z-index: 100;
+    align-items: center;
+}
+
+.team-member {
+    text-align: center;
+}
+
+.team-member img {
+    width: 85px;
+    height: 85px;
+    border-radius: 50%;
+    border: 2px solid var(--neon-cyan); /* Cyan border to contrast the host's pink */
+    object-fit: cover;
+    box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
+    transition: transform 0.3s;
+}
+
+.team-member img:hover {
+    transform: scale(1.1);
+}
+
+.team-role {
+    color: #ffd700; /* Gold */
+    font-weight: 800;
+    font-size: 11px;
+    margin-top: 5px;
+    text-transform: uppercase;
+    text-shadow: 0 0 5px rgba(255, 215, 0, 0.5);
+}
+
+.team-name {
+    color: white;
+    font-size: 10px;
+    opacity: 0.8;
+}

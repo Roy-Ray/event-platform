@@ -2,28 +2,25 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Today's Assessment</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Assessment Live</title>
     <link rel="stylesheet" href="style.css">
 </head>
 <body>
     <div class="container">
-        <h2 id="assessment-title">Loading Assessment...</h2>
-        <form id="assessment-form">
-            </form>
-        <button onclick="submitAssessment()" class="btn" style="margin-top: 20px;">Submit Assessment</button>
-        <br><br>
-        <a href="index.html">Back to Dashboard</a>
+        <h2>Question <span id="q-number">1</span></h2>
+        
+        <div class="timer-display">Time Left: <span id="timer">00:00</span></div>
+        
+        <!-- Dynamic Question Area -->
+        <div id="question-container">
+            <p>Loading question...</p>
+        </div>
+        
+        <button id="next-btn" class="btn">Submit & Next</button>
     </div>
 
+    <!-- Script linked without 'js/' path -->
     <script src="app.js"></script>
-    <script>
-        window.onload = () => {
-            if (!localStorage.getItem('userId')) {
-                window.location.href = 'index.html';
-            } else {
-                loadQuestions();
-            }
-        };
-    </script>
 </body>
 </html>
