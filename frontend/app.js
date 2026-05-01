@@ -144,6 +144,10 @@ async function loadEligibleParticipants() {
                     </li>
                 `;
             });
+            
+            // Start the dynamic visual effect once list is loaded
+            startDynamicShuffle();
+
         } else {
             list.innerHTML = '<p style="text-align:center; color:gray;">No participants registered yet.</p>';
         }
@@ -690,4 +694,50 @@ function startAutoScroll() {
             }
         }
     }, 40);
+}
+
+// ==========================================
+// DYNAMIC RANDOM SHUFFLER FOR ELIGIBLE LIST
+// ==========================================
+function startDynamicShuffle() {
+    const list = document.getElementById('eligible-list');
+    if (!list) return;
+
+    // Clear any existing intervals so it doesn't speed up accidentally
+    if (window.shuffleInterval) clearInterval(window.shuffleInterval);
+
+    window.shuffleInterval = setInterval(() => {
+        const items = list.querySelectorAll('.lb-item');
+        // Only shuffle if there are at least 4 people in the list
+        if (items.length < 4) return; 
+
+        // Pick a random person to move
+        const oldIndex = Math.floor(Math.random() * items.length);
+        const itemToMove = items[oldIndex];
+
+        // Step 1: Smoothly fade them out and shrink slightly
+        itemToMove.style.opacity = '0';
+        itemToMove.style.transform = 'scale(0.9) translateY(-10px)';
+
+        // Step 2: Wait for the fade-out to finish (600ms), then move them
+        setTimeout(() => {
+            // Pick a brand new random position
+            const newIndex = Math.floor(Math.random() * items.length);
+
+            // Move them in the HTML DOM
+            if (newIndex >= items.length - 1) {
+                list.appendChild(itemToMove); // Send to the very bottom
+            } else {
+                list.insertBefore(itemToMove, items[newIndex]); // Send to the middle/top
+            }
+
+            // Step 3: Smoothly fade them back in at their new location!
+            setTimeout(() => {
+                itemToMove.style.opacity = '1';
+                itemToMove.style.transform = 'scale(1) translateY(0)';
+            }, 50); 
+            
+        }, 600); // 600ms matches our CSS transition time
+        
+    }, 3000); // Trigger a new random shuffle every 3 seconds
 }
