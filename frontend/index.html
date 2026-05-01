@@ -21,7 +21,6 @@
         
         <!-- Judge 1 -->
         <div class="team-member">
-            <!-- Replace with actual Cloudinary link -->
             <img src="https://res.cloudinary.com/dlvpmxac5/image/upload/v1777554372/copy_of_whatsapp_image_2026-04-30_at_155016_dzakiz_3f0c69.jpg" alt="Judge 1">
             <div class="team-role">Swagata Biswas</div>
             <div class="team-name">Judge of our event</div>
@@ -29,7 +28,6 @@
 
         <!-- Judge 2 -->
         <div class="team-member">
-            <!-- Replace with actual Cloudinary link -->
             <img src="https://res.cloudinary.com/dlvpmxac5/image/upload/v1777553930/WhatsApp_Image_2026-04-30_at_15.32.48_rp2zaf.jpg" alt="Judge 2">
             <div class="team-role">Ritam Biswas</div>
             <div class="team-name">judge of our event</div>
@@ -37,7 +35,6 @@
 
         <!-- Moderator -->
         <div class="team-member">
-            <!-- Replace with actual Cloudinary link -->
             <img src="https://res.cloudinary.com/dlvpmxac5/image/upload/v1777553685/672680446_26094292056939599_6935226973905409503_n_splbyy.jpg" alt="Moderator">
             <div class="team-role">Dipan Bandyopadhyay </div>
             <div class="team-name">Modarator</div>
@@ -45,7 +42,6 @@
 
         <!-- Adviser -->
         <div class="team-member">
-            <!-- Replace with actual Cloudinary link -->
             <img src="https://res.cloudinary.com/dlvpmxac5/image/upload/v1777553509/591585503_1315831083890594_3587239061274294329_n_mgtv0r.jpg" alt="Adviser">
             <div class="team-role">Bandana Bandyopadhyay</div>
             <div class="team-name">Event Adviser</div>
@@ -79,8 +75,8 @@
                 <label>Full Name</label>
                 <input type="text" id="userName" placeholder="Enter your name" required>
                 
-                <label>District</label>
-                <input type="text" id="userDistrict" placeholder="Enter your district" required>
+                <label>District (Optional)</label>
+                <input type="text" id="userDistrict" placeholder="e.g., Kolkata">
                 
                 <label>Event Code</label>
                 <input type="password" id="generalCode" placeholder="Enter secret code" required>
@@ -93,7 +89,6 @@
                 <h3 class="leaderboard-header" style="color: #ff007f;">👥 Eligible Participants</h3>
                 
                 <ul id="eligible-list" class="leaderboard-list">
-                    <!-- JS will inject the eligible participants here -->
                     <p style="text-align: center; color: var(--text-muted);">Loading participants...</p>
                 </ul>
             </div>
@@ -110,7 +105,10 @@
                 <h3 class="action-title">Ready for Assessment ⏱️</h3>
                 
                 <div style="text-align: center; margin-bottom: 20px;">
-                    <p style="font-size: 18px;">Welcome, <strong id="display-name" style="color: var(--neon-cyan);"></strong></p>
+                    <p style="font-size: 18px; margin-bottom: 5px;">Welcome, <strong id="display-name" style="color: var(--neon-cyan);"></strong></p>
+                    <button onclick="studentLogout()" style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; text-decoration: underline; font-size: 12px;">
+                        Not you? Change User
+                    </button>
                 </div>
 
                 <div class="assessment-rules">
@@ -120,7 +118,7 @@
                     <p>3. Do not refresh the page during the test.</p>
                 </div>
                 
-                <button onclick="window.location.href='assessment.html'" class="btn" style="display: flex; justify-content: center; align-items: center; gap: 10px;">
+                <button id="start-assessment-btn" onclick="window.location.href='assessment.html'" class="btn" style="display: flex; justify-content: center; align-items: center; gap: 10px;">
                     ▶ Start Now
                 </button>
             </div>
@@ -130,16 +128,33 @@
                 <h3 class="leaderboard-header">🏆 Top Performers</h3>
                 
                 <ul id="leaderboard-list" class="leaderboard-list">
-                    <!-- JS will inject the exact list layout here -->
                     <p style="text-align: center; color: var(--text-muted);">Loading rankings...</p>
                 </ul>
             </div>
 
         </div>
+
+        <!-- ==========================================
+             LIVE JUDGE RESULTS SECTION (FULL WIDTH)
+             ========================================== -->
+        <div id="live-results-view" class="card" style="margin-top: 40px; display: none;">
+            <h2 style="text-align: center; color: var(--neon-pink); text-transform: uppercase; letter-spacing: 2px;">🏆 Final Event Results 🏆</h2>
+            <p style="text-align: center; color: var(--text-muted); margin-bottom: 25px;">Live rankings based on the judges' evaluations.</p>
+            
+            <ul id="live-results-list" class="leaderboard-list" style="max-height: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 15px;">
+                <!-- JS will inject the live results here -->
+            </ul>
+        </div>
     </div>
 
-    <!-- Admin Link hidden in corner -->
-    <a href="admin.html" style="position: fixed; bottom: 20px; right: 20px; color: var(--text-muted); font-size: 12px; text-decoration: none;">Judge Login</a>
+    <!-- NEW: Floating Judge Portal Button -->
+    <a href="admin.html" class="judge-login-float">
+        👨‍⚖️ Judge Portal
+    </a>
+    <!-- Production Credits Footer -->
+<footer class="production-footer">
+    <p>© 2026 Ray & Roy Org™ | All Rights Reserved. Developed by Ray & Roy Developers Org™</p>
+</footer>
 
     <script src="app.js"></script>
 </body>

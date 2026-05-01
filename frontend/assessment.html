@@ -3,24 +3,39 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Assessment Live</title>
+    <title>Live Assessment - Prodiper Bondana</title>
     <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
 </head>
-<body>
-    <div class="container">
-        <h2>Question <span id="q-number">1</span></h2>
+<body class="assessment-mode">
+
+    <div class="assessment-container">
         
-        <div class="timer-display">Time Left: <span id="timer">00:00</span></div>
-        
-        <!-- Dynamic Question Area -->
-        <div id="question-container">
-            <p>Loading question...</p>
+        <!-- Header with Tracker and Timer -->
+        <header class="assessment-header">
+            <div class="question-tracker">
+                QUESTION <span id="q-number">1</span> OF <span id="total-q">--</span>
+            </div>
+            <div class="timer-box">
+                <span>⏱️ Time Left:</span> 
+                <span id="timer" class="timer-text">00:00</span>
+            </div>
+        </header>
+
+        <!-- Main Question Area -->
+        <div class="card question-card">
+            <div id="question-container">
+                <p style="text-align: center; color: var(--text-muted); font-size: 18px;">Preparing your assessment...</p>
+            </div>
         </div>
-        
-        <button id="next-btn" class="btn">Submit & Next</button>
+
+        <!-- Submission Footer -->
+        <div style="text-align: right;">
+            <button id="next-btn" class="btn submit-btn" style="display: none;">Submit & Next ▶</button>
+        </div>
+
     </div>
 
-    <!-- Script linked without 'js/' path -->
     <script src="app.js"></script>
 </body>
 </html>

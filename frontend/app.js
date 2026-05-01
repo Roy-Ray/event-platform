@@ -1,21 +1,25 @@
 // ==========================================
 // CONFIGURATION & GLOBAL STATE
 // ==========================================
-const API_URL = 'http://localhost:3000';
+const API_URL = ''; 
 const DEFAULT_AVATAR = 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg';
 
-const userId = localStorage.getItem('userId');
-const userName = localStorage.getItem('userName');
+// Use sessionStorage so they must log in every time they open a new tab
+const userId = sessionStorage.getItem('userId');
+const userName = sessionStorage.getItem('userName');
+const hasCompleted = sessionStorage.getItem('hasCompleted') === 'true';
 let currentQuestions = [];
 let questionIndex = 0;
 let timerInterval;
 
-// ==========================================
-// ROUTER (Detects which page is open)
-// ==========================================
 document.addEventListener('DOMContentLoaded', () => {
-    const path = window.location.pathname;
+    // Record the page view immediately on load!
+    recordPageView(); 
+    
+    // --- NEW: Activate the Image Zoom feature ---
+    setupImageZoom(); 
 
+    const path = window.location.pathname;
     if (path.includes('index.html') || path === '/' || path.endsWith('/')) {
         initIndexPage();
     } else if (path.includes('assessment.html')) {
@@ -29,23 +33,40 @@ document.addEventListener('DOMContentLoaded', () => {
 // 1. INDEX PAGE LOGIC
 // ==========================================
 function initIndexPage() {
-    // If already logged in, skip login screen and show dashboard
     if (userId) {
         document.getElementById('pre-login-view').style.display = 'none';
         document.getElementById('post-login-view').style.display = 'grid'; 
         document.getElementById('display-name').innerText = userName;
+        
+        // Disable button if already completed
+        if (hasCompleted) {
+            const startBtn = document.getElementById('start-assessment-btn');
+            if(startBtn) {
+                startBtn.innerText = "TEST COMPLETED ✅";
+                startBtn.disabled = true;
+                startBtn.style.background = "rgba(255, 255, 255, 0.05)";
+                startBtn.style.color = "var(--neon-cyan)";
+                startBtn.style.border = "1px solid var(--neon-cyan)";
+                startBtn.style.boxShadow = "none";
+                startBtn.style.cursor = "not-allowed";
+                startBtn.onclick = null;
+            }
+        }
+        
         loadLeaderboard(); 
     } else {
-        // If NOT logged in, load the eligible participants list on the login screen
         loadEligibleParticipants();
     }
+
+    loadLiveResults(); 
 
     const loginBtn = document.getElementById('login-btn');
     if (loginBtn) {
         loginBtn.addEventListener('click', async () => {
-            const name = document.getElementById('userName').value;
-            const district = document.getElementById('userDistrict').value;
-            const code = document.getElementById('generalCode').value;
+            // Trim spaces and allow district to be blank
+            const name = document.getElementById('userName').value.trim();
+            const district = document.getElementById('userDistrict').value.trim();
+            const code = document.getElementById('generalCode').value.trim();
 
             if (!name || !code) return alert("Name and Event Code are required.");
 
@@ -58,43 +79,58 @@ function initIndexPage() {
                 const data = await res.json();
                 
                 if (data.success) {
-                    localStorage.setItem('userId', data.userId);
-                    localStorage.setItem('userName', name);
+                    // Show popup if they already took the test
+                    if (data.hasCompleted) {
+                        alert("⚠️ Welcome back! You have already submitted your assessment. You cannot take the test again.");
+                    }
+
+                    sessionStorage.setItem('userId', data.userId);
+                    sessionStorage.setItem('userName', name);
+                    sessionStorage.setItem('hasCompleted', data.hasCompleted);
                     
-                    // Switch views
                     document.getElementById('pre-login-view').style.display = 'none';
                     document.getElementById('post-login-view').style.display = 'grid';
                     document.getElementById('display-name').innerText = name;
                     
-                    loadLeaderboard(); // Load the post-login leaderboard
+                    // Disable button immediately upon login
+                    if (data.hasCompleted) {
+                        const startBtn = document.getElementById('start-assessment-btn');
+                        if(startBtn) {
+                            startBtn.innerText = "TEST COMPLETED ✅";
+                            startBtn.disabled = true;
+                            startBtn.style.background = "rgba(255, 255, 255, 0.05)";
+                            startBtn.style.color = "var(--neon-cyan)";
+                            startBtn.style.border = "1px solid var(--neon-cyan)";
+                            startBtn.style.boxShadow = "none";
+                            startBtn.style.cursor = "not-allowed";
+                            startBtn.onclick = null;
+                        }
+                    }
+
+                    loadLeaderboard(); 
                 } else {
                     alert(data.message || "Login failed.");
                 }
             } catch (err) {
-                console.error(err);
                 alert("Could not connect to the server.");
             }
         });
     }
 }
 
-// NEW FUNCTION: Fetch and render the Eligible Participants list (Pre-login)
 async function loadEligibleParticipants() {
     try {
         const res = await fetch(`${API_URL}/leaderboard`);
         const data = await res.json();
         
         const list = document.getElementById('eligible-list');
-        const activeCount = document.getElementById('active-count');
         if (!list) return;
 
         if (data.success && data.leaderboard.length > 0) {
             list.innerHTML = ''; 
-            if(activeCount) activeCount.innerText = data.leaderboard.length; // Update the counter at the top
             
             data.leaderboard.forEach((user) => {
                 const imgSrc = user.profile_pic || DEFAULT_AVATAR;
-                
                 list.innerHTML += `
                     <li class="lb-item">
                         <img src="${imgSrc}" class="lb-avatar" alt="${user.name}" style="border-color: #ff007f;">
@@ -110,49 +146,97 @@ async function loadEligibleParticipants() {
             });
         } else {
             list.innerHTML = '<p style="text-align:center; color:gray;">No participants registered yet.</p>';
-            if(activeCount) activeCount.innerText = '0';
         }
     } catch (err) {
-        console.error("Failed to load eligible participants", err);
+        console.error(err);
     }
 }
 
-// Fetch and render the dark neon leaderboard (Post-login)
 async function loadLeaderboard() {
     try {
         const res = await fetch(`${API_URL}/leaderboard`);
         const data = await res.json();
-        
         const list = document.getElementById('leaderboard-list');
         if (!list) return;
 
         if (data.success && data.leaderboard.length > 0) {
-            list.innerHTML = ''; // Clear loading text
-            
+            list.innerHTML = ''; 
             data.leaderboard.forEach((user, index) => {
                 const imgSrc = user.profile_pic || DEFAULT_AVATAR;
-                const rank = index + 1; // Calculate rank based on array order
-                
                 list.innerHTML += `
                     <li class="lb-item">
-                        <div class="lb-rank">#${rank}</div>
+                        <div class="lb-rank">#${index + 1}</div>
                         <img src="${imgSrc}" class="lb-avatar" alt="${user.name}">
                         <div class="lb-info">
                             <h4 class="lb-name">${user.name}</h4>
                             <p class="lb-district">${user.district || 'Participant'}</p>
                         </div>
-                        <div class="lb-score">
-                            ⭐ ${user.final_score}
+                        <div class="lb-score">⭐ ${user.final_score}</div>
+                    </li>
+                `;
+            });
+
+            // Trigger dynamic scroll effect
+            startAutoScroll();
+
+        } else {
+            list.innerHTML = '<p style="text-align:center; color:gray;">No scores yet.</p>';
+        }
+    } catch (err) {
+        console.error(err);
+    }
+}
+
+async function loadLiveResults() {
+    try {
+        const res = await fetch(`${API_URL}/results`);
+        const data = await res.json();
+        
+        const list = document.getElementById('live-results-list');
+        const view = document.getElementById('live-results-view');
+        if (!list || !view) return;
+
+        if (data.success && data.results.length > 0) {
+            view.style.display = 'block'; 
+            list.innerHTML = ''; 
+            
+            data.results.forEach((user, index) => {
+                const imgSrc = user.profile_pic || DEFAULT_AVATAR;
+                
+                let rankColor = "var(--text-muted)";
+                let medal = "";
+                if(index === 0) { rankColor = "#ffd700"; medal = "🥇"; }      // 1st Place
+                else if(index === 1) { rankColor = "#c0c0c0"; medal = "🥈"; } // 2nd Place
+                else if(index === 2) { rankColor = "#cd7f32"; medal = "🥉"; } // 3rd Place
+
+                list.innerHTML += `
+                    <li class="lb-item" style="border-left: 4px solid ${rankColor}; display: flex; align-items: center; padding: 15px;">
+                        <div class="lb-rank" style="color: ${rankColor}; width: 60px; font-size: 18px;">${medal} #${index + 1}</div>
+                        <img src="${imgSrc}" class="lb-avatar" alt="${user.name}" style="border-color: ${rankColor}">
+                        <div class="lb-info">
+                            <h4 class="lb-name" style="margin: 0; font-size: 16px;">${user.name}</h4>
+                            <p class="lb-district" style="margin: 0; font-size: 12px; color: var(--text-muted);">${user.district || 'Participant'}</p>
+                        </div>
+                        <div class="lb-score" style="border-color: ${rankColor}; color: ${rankColor}; background: rgba(0,0,0,0.3); padding: 5px 15px; border-radius: 20px;">
+                            ⭐ ${Number(user.final_score).toFixed(2)}
                         </div>
                     </li>
                 `;
             });
         } else {
-            list.innerHTML = '<p style="text-align:center; color:gray;">No scores yet.</p>';
+            view.style.display = 'none';
         }
     } catch (err) {
-        console.error("Failed to load leaderboard", err);
+        console.error(err);
     }
+}
+
+// Allow multiple students to use the same device
+function studentLogout() {
+    sessionStorage.removeItem('userId');
+    sessionStorage.removeItem('userName');
+    sessionStorage.removeItem('hasCompleted');
+    window.location.reload();
 }
 
 // ==========================================
@@ -164,20 +248,27 @@ async function initAssessmentPage() {
         return;
     }
 
-    // Block Paste globally to prevent cheating
+    // Kick them out if they already took the test!
+    if (sessionStorage.getItem('hasCompleted') === 'true') {
+        alert("⚠️ Access Denied: You have already completed the assessment!");
+        window.location.href = 'index.html';
+        return;
+    }
+
     document.addEventListener('paste', e => e.preventDefault());
+    document.addEventListener('contextmenu', e => e.preventDefault());
 
     try {
-        // Fetching Day 1 questions
         const res = await fetch(`${API_URL}/questions/1`);
         const data = await res.json();
         currentQuestions = data.questions || [];
         
         if (currentQuestions.length > 0) {
+            document.getElementById('total-q').innerText = currentQuestions.length;
+            document.getElementById('next-btn').style.display = 'inline-block';
             loadNextQuestion();
         } else {
-            document.getElementById('question-container').innerHTML = "<p>No questions available today.</p>";
-            document.getElementById('next-btn').style.display = 'none';
+            document.getElementById('question-container').innerHTML = "<p style='text-align:center;'>No questions available today.</p>";
         }
 
         const nextBtn = document.getElementById('next-btn');
@@ -185,13 +276,14 @@ async function initAssessmentPage() {
             nextBtn.addEventListener('click', submitCurrentAnswer);
         }
     } catch (err) {
-        console.error("Failed to load questions", err);
+        console.error(err);
     }
 }
 
 function loadNextQuestion() {
     if (questionIndex >= currentQuestions.length) {
-        alert("Assessment Complete! Thank you.");
+        alert("Assessment Complete! Returning to Dashboard.");
+        sessionStorage.setItem('hasCompleted', 'true'); // Flag as completed locally
         window.location.href = 'index.html';
         return;
     }
@@ -199,18 +291,27 @@ function loadNextQuestion() {
     const q = currentQuestions[questionIndex];
     document.getElementById('q-number').innerText = questionIndex + 1;
     
-    let html = `<p><strong>${q.question_text}</strong></p>`;
+    let html = `<div class="question-text">${q.question_text}</div>`;
     
-    // Render textarea for paragraphs, normal input for others
     if (q.question_type === 'paragraph') {
-        html += `<textarea id="answer-input" rows="8"></textarea>`;
+        html += `<textarea id="answer-input" class="assessment-input" placeholder="Type your detailed answer here... (Minimum 200 words recommended)"></textarea>`;
+    } else if (q.question_type === 'mcq') {
+        html += `<select id="answer-input" class="assessment-input" style="cursor: pointer;">
+                    <option value="">-- Select an option --</option>`;
+        if (q.options) {
+            try {
+                const opts = JSON.parse(q.options);
+                for (const [key, val] of Object.entries(opts)) {
+                    html += `<option value="${key}">${key.toUpperCase()}: ${val}</option>`;
+                }
+            } catch(e) { console.error("Invalid MCQ JSON"); }
+        }
+        html += `</select>`;
     } else {
-        html += `<input type="text" id="answer-input">`;
+        html += `<input type="text" id="answer-input" class="assessment-input" placeholder="Type your short answer here...">`;
     }
     
     document.getElementById('question-container').innerHTML = html;
-    
-    // Start the strict timer
     startTimer(q.time_limit);
 }
 
@@ -220,50 +321,57 @@ function startTimer(seconds) {
     const timerDisplay = document.getElementById('timer');
     
     timerDisplay.innerText = `${timeLeft}s`;
+    timerDisplay.classList.remove('danger');
     
     timerInterval = setInterval(() => {
         timeLeft--;
         timerDisplay.innerText = `${timeLeft}s`;
+        if (timeLeft <= 10) timerDisplay.classList.add('danger');
         if (timeLeft <= 0) {
             clearInterval(timerInterval);
-            submitCurrentAnswer(); // Auto-submit when time is up
+            submitCurrentAnswer(); 
         }
     }, 1000);
 }
 
 async function submitCurrentAnswer() {
     clearInterval(timerInterval);
+    const nextBtn = document.getElementById('next-btn');
+    nextBtn.innerText = "Saving... ⏳";
+    nextBtn.disabled = true;
+
     const q = currentQuestions[questionIndex];
     const inputEl = document.getElementById('answer-input');
     const answer = inputEl ? inputEl.value : "";
 
     try {
-        await fetch(`${API_URL}/submit`, {
+        const res = await fetch(`${API_URL}/submit`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                userId, 
-                dayNumber: 1, 
-                answers: [{ questionId: q.id, answerText: answer }] 
-            })
+            body: JSON.stringify({ userId, dayNumber: 1, answers: [{ questionId: q.id, answerText: answer }] })
         });
         
+        if (!res.ok) {
+            throw new Error("Server rejected the submission");
+        }
+        
         questionIndex++;
+        nextBtn.innerText = "Submit & Next ▶";
+        nextBtn.disabled = false;
         loadNextQuestion();
     } catch (err) {
-        console.error("Failed to submit answer", err);
-        alert("Error submitting answer. Please check your connection.");
+        console.error(err);
+        alert("Error saving answer. Please try again.");
+        nextBtn.innerText = "Submit & Next ▶";
+        nextBtn.disabled = false;
     }
 }
 
-
-
-
 // ==========================================
-// 3. ADMIN / JUDGE PAGE LOGIC (CRUD & EVALUATION)
+// 3. ADMIN / JUDGE PAGE LOGIC
 // ==========================================
 function initAdminPage() {
-    const judgeId = localStorage.getItem('judgeId');
+    const judgeId = localStorage.getItem('judgeId'); // Judges still use local storage for convenience
     const judgeName = localStorage.getItem('judgeName');
 
     if (judgeId) {
@@ -291,7 +399,7 @@ function initAdminPage() {
                 if (data.success) {
                     localStorage.setItem('judgeId', data.judgeId);
                     localStorage.setItem('judgeName', data.judgeName);
-                    window.location.reload(); // Refresh to show dashboard
+                    window.location.reload(); 
                 } else {
                     alert("Invalid Judge Code!");
                 }
@@ -308,20 +416,24 @@ function logoutJudge() {
     window.location.reload();
 }
 
-// ---- GRADING SUBMISSIONS ----
 async function loadAdminSubmissions() {
     try {
         const res = await fetch(`${API_URL}/admin/submissions`);
         const data = await res.json();
-        
         const list = document.getElementById('submissions-list');
         if (!list) return;
 
         list.innerHTML = '';
         if (data.success && data.submissions.length > 0) {
+            const judgeId = parseInt(localStorage.getItem('judgeId'));
+
             data.submissions.forEach(sub => {
                 const img = sub.profile_pic || DEFAULT_AVATAR;
                 const currentAvg = sub.avg_marks !== null ? sub.avg_marks : 'Pending';
+                const maxMarks = sub.max_marks || 10;
+                
+                const myPrevMarks = judgeId === 1 ? sub.judge1_marks : sub.judge2_marks;
+                const markVal = (myPrevMarks !== null && myPrevMarks !== undefined) ? myPrevMarks : '';
                 
                 list.innerHTML += `
                     <div class="lb-item" style="display: block;">
@@ -336,8 +448,8 @@ async function loadAdminSubmissions() {
                         <p style="background: rgba(0,0,0,0.3); padding: 15px; border-radius: 8px; border: 1px solid var(--border-color);">${sub.answer_text}</p>
                         
                         <div style="margin-top: 15px; display: flex; gap: 10px; align-items: center;">
-                            <label style="font-weight:bold;">Give Marks (0-10):</label>
-                            <input type="number" id="marks-${sub.submission_id}" max="10" min="0" style="width: 100px; margin: 0;">
+                            <label style="font-weight:bold;">Give Marks (0 - ${maxMarks}):</label>
+                            <input type="number" id="marks-${sub.submission_id}" value="${markVal}" max="${maxMarks}" min="0" style="width: 100px; margin: 0;">
                             <button class="btn" style="width: auto; padding: 10px 20px; font-size: 14px;" onclick="submitEvaluation(${sub.submission_id})">Save Score</button>
                             <span style="margin-left: auto; color: var(--text-muted);">Current Avg: <strong style="color: white;">${currentAvg}</strong></span>
                         </div>
@@ -353,7 +465,6 @@ async function loadAdminSubmissions() {
 }
 
 async function submitEvaluation(subId) {
-    // Determine which judge is grading based on ID (Judge 1 or Judge 2)
     const judgeId = parseInt(localStorage.getItem('judgeId'));
     const marks = document.getElementById(`marks-${subId}`).value;
 
@@ -368,7 +479,7 @@ async function submitEvaluation(subId) {
         
         if (res.ok) {
             alert('Marks saved successfully!');
-            loadAdminSubmissions(); // Refresh the list
+            loadAdminSubmissions(); 
         }
     } catch (err) {
         alert("Error saving marks.");
@@ -387,16 +498,26 @@ async function loadAdminQuestions() {
         list.innerHTML = '';
         if (data.success && data.questions.length > 0) {
             data.questions.forEach(q => {
+                const typeLabel = q.question_type === 'mcq' ? 'MCQ' : (q.question_type === 'fill_blank' ? 'Short Answer' : 'Paragraph');
+                
+                const qOptionsStr = q.options ? encodeURIComponent(q.options) : '';
+                const qCorrectStr = q.correct_answer ? encodeURIComponent(q.correct_answer) : '';
+                const qTextStr = encodeURIComponent(q.question_text);
+
                 list.innerHTML += `
                     <li class="lb-item" style="display: flex; justify-content: space-between; align-items: center;">
                         <div>
                             <strong style="color: #ffd700;">Day ${q.day_number}</strong> | 
-                            <span style="color: var(--neon-cyan);">${q.time_limit}s</span>
+                            <span style="color: var(--neon-pink); font-size: 12px; border: 1px solid var(--neon-pink); padding: 2px 6px; border-radius: 10px;">${typeLabel}</span>
+                            <span style="color: var(--neon-cyan); margin-left: 10px;">⏱️ ${q.time_limit}s</span>
+                            <span style="color: #ffd700; margin-left: 10px;">⭐ ${q.max_marks || 10} Marks</span>
                             <p style="margin: 5px 0;">${q.question_text}</p>
                         </div>
                         <div style="display: flex; gap: 10px;">
-                            <button class="btn" style="background: #ffaa00; width: auto; padding: 8px 15px; font-size: 14px;" onclick="startEditQuestion(${q.id}, '${q.question_text.replace(/'/g, "\\'")}', '${q.question_type}', ${q.time_limit})">Edit</button>
-                            <button class="btn" style="background: #ff3333; width: auto; padding: 8px 15px; font-size: 14px;" onclick="deleteQuestion(${q.id})">Delete</button>
+                            <button class="btn" style="background: #ffaa00; width: auto; padding: 8px 15px; font-size: 14px;" 
+                                onclick="startEditQuestion(${q.id}, '${qTextStr}', '${q.question_type}', ${q.time_limit}, '${qOptionsStr}', '${qCorrectStr}', ${q.max_marks || 10})">Edit</button>
+                            <button class="btn" style="background: #ff3333; width: auto; padding: 8px 15px; font-size: 14px;" 
+                                onclick="deleteQuestion(${q.id})">Delete</button>
                         </div>
                     </li>
                 `;
@@ -415,7 +536,10 @@ async function saveQuestion() {
         day_number: document.getElementById('qDay').value,
         question_type: document.getElementById('qType').value,
         question_text: document.getElementById('qText').value,
-        time_limit: document.getElementById('qTime').value
+        time_limit: document.getElementById('qTime').value,
+        options: document.getElementById('qOptions').value,
+        correct_answer: document.getElementById('qCorrect').value,
+        max_marks: document.getElementById('qMarks').value
     };
 
     if (!payload.question_text) return alert("Question text cannot be empty.");
@@ -440,17 +564,20 @@ async function saveQuestion() {
     }
 }
 
-function startEditQuestion(id, text, type, time) {
+function startEditQuestion(id, textEncoded, type, time, optionsEncoded, correctEncoded, marks) {
     document.getElementById('form-title').innerText = "✏️ Edit Question";
     document.getElementById('edit-q-id').value = id;
-    document.getElementById('qText').value = text;
+    document.getElementById('qText').value = decodeURIComponent(textEncoded);
     document.getElementById('qType').value = type;
     document.getElementById('qTime').value = time;
+    document.getElementById('qOptions').value = optionsEncoded ? decodeURIComponent(optionsEncoded) : '';
+    document.getElementById('qCorrect').value = correctEncoded ? decodeURIComponent(correctEncoded) : '';
+    document.getElementById('qMarks').value = marks;
     
     document.getElementById('save-q-btn').innerText = "Update Question";
     document.getElementById('cancel-edit-btn').style.display = "inline-block";
     
-    // Scroll to form
+    if (typeof toggleMCQFields === 'function') toggleMCQFields();
     document.querySelector('.crud-form').scrollIntoView({ behavior: 'smooth' });
 }
 
@@ -459,9 +586,13 @@ function cancelEdit() {
     document.getElementById('edit-q-id').value = "";
     document.getElementById('qText').value = "";
     document.getElementById('qTime').value = "300";
+    document.getElementById('qOptions').value = "";
+    document.getElementById('qCorrect').value = "";
+    document.getElementById('qMarks').value = "10";
     
     document.getElementById('save-q-btn').innerText = "Save Question";
     document.getElementById('cancel-edit-btn').style.display = "none";
+    if (typeof toggleMCQFields === 'function') toggleMCQFields();
 }
 
 async function deleteQuestion(id) {
@@ -478,3 +609,85 @@ async function deleteQuestion(id) {
     }
 }
 
+// ==========================================
+// DYNAMIC UI EFFECTS (PAGE VIEWS TRACKER)
+// ==========================================
+
+async function recordPageView() {
+    const counter = document.getElementById('active-count');
+    if (!counter) return;
+
+    try {
+        // Calls the backend route to +1 the view count and retrieve the new total
+        const res = await fetch(`${API_URL}/pageview`);
+        const data = await res.json();
+        
+        if (data.success) {
+            counter.innerText = data.views;
+        }
+    } catch (err) {
+        console.error("Error fetching page views");
+    }
+}
+
+// ==========================================
+// IMAGE ZOOM FEATURE (1.5 SECONDS)
+// ==========================================
+function setupImageZoom() {
+    // 1. Create the overlay element behind the scenes
+    const overlay = document.createElement('div');
+    overlay.className = 'img-zoom-overlay';
+    const popupImg = document.createElement('img');
+    overlay.appendChild(popupImg);
+    document.body.appendChild(overlay);
+
+    let zoomTimeout;
+
+    // 2. Listen for clicks anywhere on the page
+    document.body.addEventListener('click', (e) => {
+        // Check if the thing they clicked was an Image (IMG)
+        if (e.target.tagName === 'IMG') {
+            e.preventDefault();
+
+            // Copy the source of the clicked image into our popup image
+            popupImg.src = e.target.src;
+            
+            // Show the popup!
+            overlay.classList.add('active');
+
+            // Reset the timer in case they click multiple images quickly
+            clearTimeout(zoomTimeout);
+
+            // Hide the popup exactly 1.5 seconds (1500 milliseconds) later
+            zoomTimeout = setTimeout(() => {
+                overlay.classList.remove('active');
+            }, 1500);
+        }
+    });
+
+    // 3. Optional: Let them click the background to close it early
+    overlay.addEventListener('click', () => {
+        overlay.classList.remove('active');
+        clearTimeout(zoomTimeout);
+    });
+}
+
+function startAutoScroll() {
+    const list = document.getElementById('leaderboard-list');
+    if (!list) return;
+
+    let isHovered = false;
+
+    list.addEventListener('mouseenter', () => isHovered = true);
+    list.addEventListener('mouseleave', () => isHovered = false);
+
+    setInterval(() => {
+        if (!isHovered && list.scrollHeight > list.clientHeight) {
+            list.scrollTop += 1; 
+            
+            if (list.scrollTop + list.clientHeight >= list.scrollHeight - 1) {
+                setTimeout(() => list.scrollTop = 0, 1000);
+            }
+        }
+    }, 40);
+}

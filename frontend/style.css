@@ -2,14 +2,25 @@
    GLOBAL STYLES & VARIABLES
    ========================================== */
 :root {
-    --bg-dark: #120822; /* Deep purple background */
-    --card-bg: #1e1133; /* Slightly lighter purple for cards */
-    --item-bg: #160a26; /* Darker background for list items */
+    --bg-dark: #120822; 
+    --card-bg: #1e1133; 
+    --item-bg: #160a26; 
     --neon-pink: #ff007f;
     --neon-cyan: #00f0ff;
     --text-main: #ffffff;
     --text-muted: #a098b0;
     --border-color: rgba(255, 255, 255, 0.08);
+}
+
+/* 1. STRICT EDGE FITTING RULE: Prevents padding/borders from expanding beyond 100% width */
+*, *::before, *::after {
+    box-sizing: border-box;
+}
+
+html, body {
+    overflow-x: hidden; /* 2. STOPS HORIZONTAL SCROLLING COMPLETELY */
+    width: 100%;
+    max-width: 100%;
 }
 
 body { 
@@ -30,12 +41,14 @@ body {
 .event-header {
     text-align: center;
     padding: 30px 20px 10px;
+    width: 100%;
 }
 
 .event-header h1 {
     font-size: 36px;
     margin: 0 0 10px 0;
     text-shadow: 0 0 10px rgba(255,255,255,0.5);
+    word-wrap: break-word; /* Prevents long titles from breaking the edge */
 }
 
 .event-subtitle {
@@ -45,7 +58,7 @@ body {
 }
 
 .event-subtitle span {
-    color: #ffd700; /* Gold color like the image */
+    color: #ffd700; 
 }
 
 .organizer {
@@ -65,6 +78,7 @@ body {
     display: inline-block;
     box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
     margin-bottom: 15px;
+    max-width: 100%;
 }
 
 .live-viewers {
@@ -83,16 +97,18 @@ body {
    ========================================== */
 .container {
     max-width: 1100px;
+    width: 100%;
     margin: 0 auto;
     padding: 20px;
 }
 
 .dashboard-wrapper {
     display: grid;
-    grid-template-columns: 1fr 1fr; /* 50/50 split like the image */
+    grid-template-columns: 1fr 1fr; 
     gap: 30px;
-    align-items: start;
+    align-items: stretch; 
     margin-top: 20px;
+    width: 100%;
 }
 
 .card {
@@ -101,6 +117,13 @@ body {
     padding: 30px;
     border: 1px solid var(--border-color);
     box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+}
+
+.dashboard-wrapper .card .btn {
+    margin-top: auto; 
 }
 
 /* ==========================================
@@ -112,10 +135,10 @@ input, select, textarea {
     margin: 10px 0 20px 0; 
     border: 1px solid var(--border-color); 
     border-radius: 8px; 
-    box-sizing: border-box; 
     font-size: 15px;
     background: rgba(0,0,0,0.2);
     color: white;
+    max-width: 100%; /* Strict edge fitting */
 }
 
 input:focus { outline: none; border-color: var(--neon-cyan); }
@@ -182,9 +205,9 @@ input:focus { outline: none; border-color: var(--neon-cyan); }
     margin: 0;
     max-height: 400px;
     overflow-y: auto;
+    scroll-behavior: smooth; 
 }
 
-/* Custom Scrollbar for Leaderboard */
 .leaderboard-list::-webkit-scrollbar { width: 6px; }
 .leaderboard-list::-webkit-scrollbar-track { background: transparent; }
 .leaderboard-list::-webkit-scrollbar-thumb { background: var(--border-color); border-radius: 10px; }
@@ -197,6 +220,7 @@ input:focus { outline: none; border-color: var(--neon-cyan); }
     border-radius: 12px;
     margin-bottom: 12px;
     border: 1px solid var(--border-color);
+    width: 100%; /* strict fitting */
 }
 
 .lb-rank {
@@ -204,6 +228,7 @@ input:focus { outline: none; border-color: var(--neon-cyan); }
     font-weight: 900;
     color: #ffd700;
     width: 40px;
+    flex-shrink: 0;
 }
 
 .lb-avatar {
@@ -213,11 +238,32 @@ input:focus { outline: none; border-color: var(--neon-cyan); }
     object-fit: cover;
     border: 2px solid var(--neon-pink);
     margin-right: 15px;
+    flex-shrink: 0;
+    cursor: pointer; 
 }
 
-.lb-info { flex-grow: 1; }
-.lb-name { font-weight: bold; font-size: 16px; margin: 0 0 4px 0; }
-.lb-district { font-size: 12px; color: var(--text-muted); margin: 0; }
+.lb-info { 
+    flex-grow: 1; 
+    overflow: hidden; 
+}
+
+.lb-name { 
+    font-weight: bold; 
+    font-size: 16px; 
+    margin: 0 0 4px 0; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis; 
+}
+
+.lb-district { 
+    font-size: 12px; 
+    color: var(--text-muted); 
+    margin: 0; 
+    white-space: nowrap; 
+    overflow: hidden; 
+    text-overflow: ellipsis;
+}
 
 .lb-score {
     background: rgba(0, 240, 255, 0.1);
@@ -230,7 +276,9 @@ input:focus { outline: none; border-color: var(--neon-cyan); }
     display: flex;
     align-items: center;
     gap: 5px;
+    flex-shrink: 0;
 }
+
 /* ==========================================
    HOST PROFILE (TOP LEFT CORNER)
    ========================================== */
@@ -249,23 +297,25 @@ input:focus { outline: none; border-color: var(--neon-cyan); }
     border: 3px solid var(--neon-pink);
     object-fit: cover;
     box-shadow: 0 0 15px rgba(255, 0, 127, 0.5);
+    cursor: pointer;
 }
 
 .host-name {
-    color: #ffd700; /* Gold color */
+    color: #ffd700; 
     font-weight: 900;
     font-size: 16px;
     margin-top: 5px;
     text-shadow: 0 0 10px rgba(255, 215, 0, 0.5);
     letter-spacing: 1px;
 }
+
 /* ==========================================
-   EVENT TEAM PANEL (RIGHT SIDE)
+   EVENT TEAM PANEL (TOP RIGHT)
    ========================================== */
 .team-panel {
     position: absolute;
     top: 60px;
-    right: 20px;
+    right: 20px; /* Kept on the right! */
     display: flex;
     flex-direction: column;
     gap: 20px;
@@ -281,10 +331,11 @@ input:focus { outline: none; border-color: var(--neon-cyan); }
     width: 85px;
     height: 85px;
     border-radius: 50%;
-    border: 2px solid var(--neon-cyan); /* Cyan border to contrast the host's pink */
+    border: 2px solid var(--neon-cyan); 
     object-fit: cover;
     box-shadow: 0 0 12px rgba(0, 240, 255, 0.4);
     transition: transform 0.3s;
+    cursor: pointer;
 }
 
 .team-member img:hover {
@@ -292,7 +343,7 @@ input:focus { outline: none; border-color: var(--neon-cyan); }
 }
 
 .team-role {
-    color: #ffd700; /* Gold */
+    color: #ffd700; 
     font-weight: 800;
     font-size: 11px;
     margin-top: 5px;
@@ -304,4 +355,183 @@ input:focus { outline: none; border-color: var(--neon-cyan); }
     color: white;
     font-size: 10px;
     opacity: 0.8;
+}
+
+/* ==========================================
+   IMAGE ZOOM POPUP
+   ========================================== */
+.img-zoom-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%; 
+    height: 100%; 
+    background: rgba(0, 0, 0, 0.85); 
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999; 
+    opacity: 0;
+    pointer-events: none;
+    transition: opacity 0.3s ease;
+}
+
+.img-zoom-overlay.active {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.img-zoom-overlay img {
+    max-width: 90%;
+    max-height: 90%;
+    border: 4px solid var(--neon-pink);
+    border-radius: 16px;
+    box-shadow: 0 0 30px rgba(255, 0, 127, 0.8);
+    transform: scale(0.8);
+    transition: transform 0.3s ease;
+}
+
+.img-zoom-overlay.active img {
+    transform: scale(1);
+}
+
+/* ==========================================
+   JUDGE PORTAL FLOATING BUTTON (BOTTOM LEFT)
+   ========================================== */
+.judge-login-float {
+    position: fixed;
+    bottom: 30px;
+    left: 30px; /* Placed cleanly on the Left */
+    background: rgba(0, 240, 255, 0.05); 
+    border: 1px solid var(--neon-cyan);
+    color: var(--neon-cyan);
+    padding: 12px 24px;
+    border-radius: 30px;
+    font-weight: 600;
+    font-size: 14px;
+    text-decoration: none;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    backdrop-filter: blur(10px); 
+    box-shadow: 0 0 15px rgba(0, 240, 255, 0.2);
+    transition: all 0.3s ease;
+    z-index: 1000; 
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.judge-login-float:hover {
+    background: var(--neon-cyan);
+    color: #000;
+    box-shadow: 0 0 25px rgba(0, 240, 255, 0.6);
+    transform: translateY(-3px);
+}
+
+/* ==========================================
+   MOBILE STRICT EDGE-FITTING RULES
+   ========================================== */
+@media (max-width: 850px) {
+    
+    .container {
+        padding: 10px; 
+    }
+
+    .dashboard-wrapper {
+        grid-template-columns: 1fr; 
+        gap: 15px;
+    }
+
+    .card {
+        padding: 20px 15px; 
+    }
+
+    .event-header h1 {
+        font-size: 24px;
+    }
+    
+    .event-subtitle {
+        font-size: 16px;
+    }
+
+    /* Move Host Profile into the normal document flow */
+    .host-profile {
+        position: relative; 
+        top: auto;
+        left: auto;
+        margin-bottom: 10px;
+    }
+
+    .host-profile img {
+        width: 70px; /* Shrunk for mobile */
+        height: 70px;
+    }
+
+    /* Move Team Panel into a horizontal row at the top */
+    .team-panel {
+        position: relative; 
+        top: auto;
+        right: auto;
+        flex-direction: row; 
+        justify-content: center;
+        flex-wrap: wrap; 
+        margin-top: 5px;
+        margin-bottom: 15px;
+        gap: 10px;
+        width: 100%;
+    }
+
+    .team-member img {
+        width: 45px; /* Extremely small for mobile so it fits nicely */
+        height: 45px;
+    }
+
+    .team-role { font-size: 8px; }
+    .team-name { font-size: 7px; }
+
+    #live-results-list {
+        grid-template-columns: 1fr !important; 
+    }
+    
+    .lb-item {
+        padding: 10px;
+    }
+
+    /* Shrink the floating judge button on mobile */
+    .judge-login-float {
+        bottom: 15px;
+        left: 15px; /* Stay on the left on mobile too */
+        padding: 8px 12px;
+        font-size: 10px;
+    }
+}
+/* ==========================================
+   PRODUCTION FOOTER
+   ========================================== */
+.production-footer {
+    width: 100%;
+    text-align: center;
+    padding: 20px 10px 80px 10px; /* Extra padding for bottom-left floating button */
+    margin-top: 40px;
+    border-top: 1px solid var(--border-color);
+}
+
+.production-footer p {
+    color: var(--text-muted);
+    font-size: 10px; /* Slightly smaller for a premium feel */
+    letter-spacing: 1.5px; /* Increased spacing for professional look */
+    text-transform: uppercase;
+    opacity: 0.5;
+    margin: 0;
+}
+
+/* Mobile Adjustments */
+@media (max-width: 850px) {
+    .production-footer {
+        padding-bottom: 100px;
+    }
+    .production-footer p {
+        font-size: 8px;
+        letter-spacing: 1px;
+    }
 }
