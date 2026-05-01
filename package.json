@@ -1,0 +1,14 @@
+{
+  "name": "pradiper-bandana-event",
+  "version": "1.0.0",
+  "description": "Student Assessment Event Platform",
+  "main": "backend/server.js",
+  "scripts": {
+    "start": "node backend/server.js"
+  },
+  "dependencies": {
+    "cors": "^2.8.5",
+    "express": "^4.19.0",
+    "mysql2": "^3.9.0"
+  }
+}
