@@ -102,6 +102,76 @@
             color: #000;
             box-shadow: 0 0 15px var(--neon-cyan);
         }
+
+        /* --- PROFESSIONAL DEVELOPER FOOTER --- */
+        .developer-promo {
+            margin-top: 120px;
+            margin-bottom: 40px;
+            padding: 40px 20px;
+            text-align: center;
+            background: linear-gradient(to top, rgba(0, 240, 255, 0.05), transparent);
+            border-top: 1px solid rgba(0, 240, 255, 0.2);
+            border-bottom: 1px solid rgba(0, 240, 255, 0.2);
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            border-radius: 16px;
+            backdrop-filter: blur(5px);
+        }
+        .dev-title {
+            color: var(--text-muted, #a098b0);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            font-size: 14px;
+            margin-bottom: 10px;
+        }
+        .dev-org {
+            color: white;
+            font-size: 22px;
+            font-weight: bold;
+            margin: 5px 0 15px 0;
+        }
+        .dev-org .highlight {
+            color: #00f0ff; /* Neon Cyan */
+            text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
+        }
+        .dev-contact {
+            color: var(--text-muted, #a098b0);
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        .dev-email {
+            display: inline-block;
+            margin-top: 15px;
+            color: #ffd700;
+            font-size: 16px;
+            font-weight: bold;
+            text-decoration: none;
+            padding: 10px 24px;
+            border: 1px solid #ffd700;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+            background: rgba(255, 215, 0, 0.05);
+            letter-spacing: 1px;
+        }
+        .dev-email:hover {
+            background: #ffd700;
+            color: #000;
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.5);
+            transform: translateY(-3px);
+        }
+        
+        /* Adds a nice round border and glow to your developer photo */
+        .dev-profile-pic {
+            width: 90px;
+            height: 90px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 2px solid var(--neon-cyan);
+            box-shadow: 0 0 15px rgba(0, 240, 255, 0.5);
+            margin: 15px auto 10px auto;
+            display: block;
+        }
     </style>
 </head>
 <body class="winners-page">
@@ -115,6 +185,21 @@
     </div>
 
     <a href="index.html" class="back-btn">Back to Dashboard</a>
+
+    <!-- Developer Promotion Section -->
+    <div class="developer-promo">
+        <h3 class="dev-title">Meet Our Developer</h3>
+        
+        <!-- Your Profile Picture -->
+        <img src="https://res.cloudinary.com/dzkdnt68l/image/upload/v1777629720/IMG-20260417-WA0020_-_Sourav_Roy_xgyswu.jpg" alt="Sourav Roy" class="dev-profile-pic">
+        
+        <p class="dev-org">Proudly built by the <span class="highlight">Ray & Roy Engineering Team</span></p>
+        <p class="dev-contact">
+            Looking for high-performance, cloud-deployed web applications?<br>
+            For custom development inquiries, get in touch below:
+        </p>
+        <a href="mailto:roysourav1812@zoho.in" class="dev-email">✉️ roysourav1812@zoho.in</a>
+    </div>
 
     <script>
         const API_URL = ''; // Leave blank for Render
