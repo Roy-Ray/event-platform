@@ -273,6 +273,19 @@ app.get('/pageview', async (req, res) => {
         res.status(500).json({ success: false });
     }
 });
+// ==========================================
+// 7. FETCH FINAL WINNERS (EQUAL CELEBRATION)
+// ==========================================
+app.get('/final-winners', async (req, res) => {
+    try {
+        // Just select everyone, no ordering by rank needed
+        const [winners] = await pool.query('SELECT * FROM FinalWinners');
+        res.json({ success: true, winners });
+    } catch (err) {
+        console.error("FINAL WINNERS ERROR: ", err);
+        res.status(500).json({ success: false });
+    }
+});
 
 const PORT = process.env.PORT || 3000;
 app.listen(PORT, () => {

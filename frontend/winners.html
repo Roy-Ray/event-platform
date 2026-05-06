@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Grand Finale Winners</title>
+    <link rel="stylesheet" href="style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700;900&display=swap" rel="stylesheet">
+    <!-- Confetti Library -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <style>
+        body.winners-page {
+            background-color: #0a0410;
+            background-image: radial-gradient(circle at 50% 50%, rgba(255, 0, 127, 0.15) 0%, transparent 60%);
+            overflow-x: hidden;
+            min-height: 100vh;
+        }
+        .winners-header {
+            text-align: center;
+            margin-top: 50px;
+            text-transform: uppercase;
+            letter-spacing: 3px;
+            color: #ffd700;
+            text-shadow: 0 0 20px rgba(255, 215, 0, 0.6);
+            animation: pulseGlow 2s infinite alternate;
+        }
+        @keyframes pulseGlow {
+            from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
+            to { text-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 10px #fff; }
+        }
+        
+        /* New Grid Layout for Equal Winners */
+        .winner-grid {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 40px 30px; /* Top/bottom gap is larger for the floating heads */
+            margin-top: 100px;
+            padding: 20px;
+            max-width: 1200px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        /* Equal Golden Cards for Everyone */
+        .winner-card {
+            background: linear-gradient(to top, rgba(255,215,0,0.05), rgba(30,17,51,0.9));
+            border-top: 4px solid #ffd700;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            width: 250px;
+            position: relative;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        .winner-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3);
+        }
+        .winner-avatar {
+            width: 100px;
+            height: 100px;
+            border-radius: 50%;
+            object-fit: cover;
+            border: 3px solid #ffd700;
+            position: absolute;
+            top: -50px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e1133;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+        .winner-name {
+            margin-top: 55px;
+            font-size: 18px;
+            font-weight: bold;
+            color: white;
+        }
+        .winner-district {
+            font-size: 13px;
+            color: var(--text-muted);
+            margin-top: 5px;
+        }
+        
+        .back-btn {
+            display: block;
+            width: 220px;
+            margin: 60px auto;
+            text-align: center;
+            background: transparent;
+            border: 1px solid var(--neon-cyan);
+            color: var(--neon-cyan);
+            padding: 12px;
+            border-radius: 30px;
+            text-decoration: none;
+            transition: 0.3s;
+            font-weight: bold;
+        }
+        .back-btn:hover {
+            background: var(--neon-cyan);
+            color: #000;
+            box-shadow: 0 0 15px var(--neon-cyan);
+        }
+    </style>
+</head>
+<body class="winners-page">
+
+    <h1 class="winners-header">🎉 Grand Finale Winners 🎉</h1>
+    <p style="text-align: center; color: var(--text-muted);">Pradiper Bandana Event 2026</p>
+
+    <!-- The new flexible grid container -->
+    <div class="winner-grid" id="winner-grid">
+        <p style="color: white; text-align: center; width: 100%;">Loading results...</p>
+    </div>
+
+    <a href="index.html" class="back-btn">Back to Dashboard</a>
+
+    <script>
+        const API_URL = ''; // Leave blank for Render
+
+        document.addEventListener('DOMContentLoaded', () => {
+            fetchWinners();
+            triggerFireworks();
+        });
+
+        async function fetchWinners() {
+            try {
+                const res = await fetch(`${API_URL}/final-winners`);
+                const data = await res.json();
+                
+                const grid = document.getElementById('winner-grid');
+                
+                if (data.success && data.winners.length > 0) {
+                    grid.innerHTML = ''; // Clear loading text
+                    
+                    // Loop through ALL winners equally and create a card
+                    data.winners.forEach(winner => {
+                        const img = winner.profile_pic || 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg';
+
+                        grid.innerHTML += `
+                            <div class="winner-card">
+                                <img src="${img}" class="winner-avatar" alt="${winner.name}">
+                                <div class="winner-name">${winner.name}</div>
+                                <div class="winner-district">${winner.district || 'Champion'}</div>
+                            </div>
+                        `;
+                    });
+                } else {
+                    grid.innerHTML = '<p style="color:gray; width: 100%; text-align: center;">Winners not announced yet.</p>';
+                }
+            } catch (err) {
+                console.error(err);
+            }
+        }
+
+        // --- THE CELEBRATION EFFECT (Confetti) ---
+        function triggerFireworks() {
+            var duration = 5 * 1000;
+            var animationEnd = Date.now() + duration;
+            var defaults = { startVelocity: 30, spread: 360, ticks: 60, zIndex: 0 };
+
+            function randomInRange(min, max) {
+                return Math.random() * (max - min) + min;
+            }
+
+            var interval = setInterval(function() {
+                var timeLeft = animationEnd - Date.now();
+
+                if (timeLeft <= 0) {
+                    return clearInterval(interval);
+                }
+
+                var particleCount = 50 * (timeLeft / duration);
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.1, 0.3), y: Math.random() - 0.2 } }));
+                confetti(Object.assign({}, defaults, { particleCount, origin: { x: randomInRange(0.7, 0.9), y: Math.random() - 0.2 } }));
+            }, 250);
+        }
+    </script>
+</body>
+</html>
