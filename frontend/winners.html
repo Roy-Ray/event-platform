@@ -28,24 +28,33 @@
             from { text-shadow: 0 0 10px rgba(255, 215, 0, 0.4); }
             to { text-shadow: 0 0 30px rgba(255, 215, 0, 0.9), 0 0 10px #fff; }
         }
+
+        /* --- TIER TITLES --- */
+        .tier-title {
+            text-align: center;
+            font-size: 28px;
+            margin-top: 60px;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+        }
+        .title-a { color: #ffd700; text-shadow: 0 0 15px rgba(255, 215, 0, 0.5); }
+        .title-b { color: #c0c0c0; text-shadow: 0 0 15px rgba(192, 192, 192, 0.5); margin-top: 80px;}
         
-        /* New Grid Layout for Equal Winners */
+        /* Grid Layout */
         .winner-grid {
             display: flex;
             flex-wrap: wrap;
             justify-content: center;
-            gap: 40px 30px; /* Top/bottom gap is larger for the floating heads */
-            margin-top: 100px;
+            gap: 50px 30px; 
+            margin-top: 60px;
             padding: 20px;
             max-width: 1200px;
             margin-left: auto;
             margin-right: auto;
         }
         
-        /* Equal Golden Cards for Everyone */
+        /* Base Card Styling */
         .winner-card {
-            background: linear-gradient(to top, rgba(255,215,0,0.05), rgba(30,17,51,0.9));
-            border-top: 4px solid #ffd700;
             border-radius: 16px;
             padding: 20px;
             text-align: center;
@@ -56,20 +65,17 @@
         }
         .winner-card:hover {
             transform: translateY(-10px);
-            box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3);
         }
         .winner-avatar {
             width: 100px;
             height: 100px;
             border-radius: 50%;
             object-fit: cover;
-            border: 3px solid #ffd700;
             position: absolute;
             top: -50px;
             left: 50%;
             transform: translateX(-50%);
             background: #1e1133;
-            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
         }
         .winner-name {
             margin-top: 55px;
@@ -82,6 +88,31 @@
             color: var(--text-muted);
             margin-top: 5px;
         }
+
+        /* GRADE A (GOLD) STYLING */
+        .grade-a {
+            background: linear-gradient(to top, rgba(255,215,0,0.05), rgba(30,17,51,0.9));
+            border-top: 4px solid #ffd700;
+        }
+        .grade-a:hover { box-shadow: 0 15px 40px rgba(255, 215, 0, 0.3); }
+        .grade-a .winner-avatar {
+            border: 3px solid #ffd700;
+            box-shadow: 0 0 15px rgba(255, 215, 0, 0.5);
+        }
+
+        /* GRADE B (SILVER) STYLING */
+        .grade-b {
+            background: linear-gradient(to top, rgba(192,192,192,0.05), rgba(30,17,51,0.9));
+            border-top: 4px solid #c0c0c0;
+            width: 220px; 
+        }
+        .grade-b:hover { box-shadow: 0 15px 40px rgba(192, 192, 192, 0.3); }
+        .grade-b .winner-avatar {
+            border: 3px solid #c0c0c0;
+            box-shadow: 0 0 15px rgba(192, 192, 192, 0.5);
+            width: 85px; height: 85px; top: -42px;
+        }
+        .grade-b .winner-name { margin-top: 45px; font-size: 16px;}
         
         .back-btn {
             display: block;
@@ -132,7 +163,7 @@
             margin: 5px 0 15px 0;
         }
         .dev-org .highlight {
-            color: #00f0ff; /* Neon Cyan */
+            color: #00f0ff; 
             text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
         }
         @media (max-width: 600px) {
@@ -142,11 +173,11 @@
             .developer-promo {
                 padding: 30px 15px; 
             }
-            /* This forces the organization name to its own line on mobile */
             .dev-org .highlight {
                 display: block; 
                 margin-top: 5px; 
             }
+            .winner-grid { gap: 60px 20px; }
         }
         .dev-contact {
             color: var(--text-muted, #a098b0);
@@ -175,7 +206,6 @@
             transform: translateY(-3px);
         }
         
-        /* Adds a nice round border and glow to your developer photo */
         .dev-profile-pic {
             width: 120px;
             height: 120px;
@@ -193,10 +223,15 @@
     <h1 class="winners-header">🎉 Grand Finale Winners 🎉</h1>
     <p style="text-align: center; color: var(--text-muted);">Pradiper Bandana Event 2026</p>
 
-    <!-- The new flexible grid container -->
-    <div class="winner-grid" id="winner-grid">
+    <!-- GRADE A SECTION -->
+    <h2 class="tier-title title-a" id="title-a" style="display: none;">🌟 Grade A Champions 🌟</h2>
+    <div class="winner-grid" id="grade-a-grid">
         <p style="color: white; text-align: center; width: 100%;">Loading results...</p>
     </div>
+
+    <!-- GRADE B SECTION -->
+    <h2 class="tier-title title-b" id="title-b" style="display: none;">✨ Grade B Winners ✨</h2>
+    <div class="winner-grid" id="grade-b-grid"></div>
 
     <a href="index.html" class="back-btn">Back to Dashboard</a>
 
@@ -212,7 +247,7 @@
             Looking for high-performance, cloud-deployed web applications?<br>
             For custom development inquiries, get in touch below:
         </p>
-        <h3><a href="mailto:roysourav1812@zohomail.in" class="dev-email">✉️ roysourav1812@zohomail.in</a> </h3>
+        <h3><a href="mailto:roysourav1812@zohomail.in" class="dev-email">✉️ roysourav1812@zohomail.in</a></h3>
     </div>
 
     <script>
@@ -228,25 +263,44 @@
                 const res = await fetch(`${API_URL}/final-winners`);
                 const data = await res.json();
                 
-                const grid = document.getElementById('winner-grid');
+                const gridA = document.getElementById('grade-a-grid');
+                const gridB = document.getElementById('grade-b-grid');
                 
                 if (data.success && data.winners.length > 0) {
-                    grid.innerHTML = ''; // Clear loading text
+                    gridA.innerHTML = ''; 
+                    gridB.innerHTML = ''; 
+
+                    let hasGradeA = false;
+                    let hasGradeB = false;
                     
-                    // Loop through ALL winners equally and create a card
                     data.winners.forEach(winner => {
                         const img = winner.profile_pic || 'https://res.cloudinary.com/demo/image/upload/v1312461204/sample.jpg';
+                        // Default to A if grade is somehow missing
+                        const gradeClass = (winner.grade === 'B') ? 'grade-b' : 'grade-a';
 
-                        grid.innerHTML += `
-                            <div class="winner-card">
+                        const cardHTML = `
+                            <div class="winner-card ${gradeClass}">
                                 <img src="${img}" class="winner-avatar" alt="${winner.name}">
                                 <div class="winner-name">${winner.name}</div>
                                 <div class="winner-district">${winner.district || 'Champion'}</div>
                             </div>
                         `;
+
+                        if (winner.grade === 'B') {
+                            gridB.innerHTML += cardHTML;
+                            hasGradeB = true;
+                        } else {
+                            gridA.innerHTML += cardHTML;
+                            hasGradeA = true;
+                        }
                     });
+
+                    // Show titles only if there are winners in that tier
+                    if (hasGradeA) document.getElementById('title-a').style.display = 'block';
+                    if (hasGradeB) document.getElementById('title-b').style.display = 'block';
+
                 } else {
-                    grid.innerHTML = '<p style="color:gray; width: 100%; text-align: center;">Winners not announced yet.</p>';
+                    gridA.innerHTML = '<p style="color:gray; width: 100%; text-align: center;">Winners not announced yet.</p>';
                 }
             } catch (err) {
                 console.error(err);

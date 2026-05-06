@@ -278,8 +278,8 @@ app.get('/pageview', async (req, res) => {
 // ==========================================
 app.get('/final-winners', async (req, res) => {
     try {
-        // Just select everyone, no ordering by rank needed
-        const [winners] = await pool.query('SELECT * FROM FinalWinners');
+        // Now we order by grade so 'A' comes before 'B'
+        const [winners] = await pool.query('SELECT * FROM FinalWinners ORDER BY grade ASC');
         res.json({ success: true, winners });
     } catch (err) {
         console.error("FINAL WINNERS ERROR: ", err);
