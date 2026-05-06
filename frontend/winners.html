@@ -135,10 +135,19 @@
             color: #00f0ff; /* Neon Cyan */
             text-shadow: 0 0 10px rgba(0, 240, 255, 0.4);
         }
+        @media (max-width: 600px) {
+            .dev-org {
+                font-size: 16px; /* Shrinks the text so it fits perfectly on mobile */
+            }
+            .developer-promo {
+                padding: 30px 15px; /* Makes the box a bit slimmer for phones */
+            }
+        }
         .dev-contact {
             color: var(--text-muted, #a098b0);
             font-size: 14px;
             line-height: 1.6;
+            display: inline-block;
         }
         .dev-email {
             display: inline-block;
